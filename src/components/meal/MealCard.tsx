@@ -28,9 +28,9 @@ export default function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
           {meal.foods.map((f) => (
             <li key={f.id}>
               <span className="font-medium">{f.title}</span> — {f.name} •{" "}
-              {f.qty} g • Carbs {f.carbs} g • Fat {f.fat}% • Fiber {f.fiber}% •
+              {f.qty} g • Carbs {f.carbs} % • Fat {f.fat}% • Fiber {f.fiber}% •
               Protein {f.protein}% • {f.sugarType} • IG{" "}
-              {Math.round(computeFoodIG(f)) - 10}
+              {Math.round(computeFoodIG(f))}
             </li>
           ))}
         </ul>

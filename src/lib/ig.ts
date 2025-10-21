@@ -85,7 +85,7 @@ export function computeFoodIG(f: Food): number {
     igBase = igBase - delta;
   }
 
-  return clamp01_100(igBase);
+  return clamp01_100(igBase) - 10;
 }
 
 export function computeMealIG(foods: Food[]): number | null {
@@ -102,6 +102,5 @@ export function computeMealIG(foods: Food[]): number | null {
   }
 
   if (totalAvailCarbs <= 0) return null;
-  const raw = weighted / totalAvailCarbs;
-  return raw - 10;
+  return weighted / totalAvailCarbs;
 }
