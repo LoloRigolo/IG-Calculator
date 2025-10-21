@@ -4,9 +4,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import FoodCard from "@/components/food/FoodCard";
 import MealCard from "@/components/meal/MealCard";
-import type { FoodForm, Food } from "@/types/food";
+import type { FoodForm, Food as FoodModel } from "@/types/food";
 import type { Meal } from "@/types/meal";
 import { computeMealIG } from "@/lib/ig";
+
+const s = (v?: number) => (v == null ? "" : String(v));
+const parseOpt = (txt: string): number | undefined =>
+  txt.trim() === "" ? undefined : Number(txt);
+const parseReq = (txt: string): number => Number(txt || 0);
 
 export default function Home() {
   const [open, setOpen] = useState(false);
@@ -21,11 +26,15 @@ export default function Home() {
       name: "",
       qty: "",
       carbs: "",
-      fat: "",
+      sugars: "",
       fiber: "",
+      fat: "",
       protein: "",
       cookTime: "",
       restTime: "",
+      sugarType: "",
+      starchProcessing: "",
+      carbsIncludeFiber: false,
     };
   }
 
@@ -63,27 +72,30 @@ export default function Home() {
     setEditingMealId(null);
   }
 
-  function createFoodsFromForms(): Food[] {
+  function createFoodsFromForms(): FoodModel[] {
     return forms
-      .filter((f) => f.name && f.qty !== "")
-      .map((f) => ({
+      .filter((f) => f.name && f.qty.trim() !== "")
+      .map((f, idx) => ({
         id: crypto.randomUUID(),
-        title: f.titre,
-        name: f.name,
-        qty: Number(f.qty || 0),
-        carbs: Number(f.carbs || 0),
-        fat: Number(f.fat || 0),
-        fiber: Number(f.fiber || 0),
-        protein: Number(f.protein || 0),
-        cookTime: Number(f.cookTime || 0),
-        restTime: Number(f.restTime || 0),
+        title: f.titre || `Food ${idx + 1}`,
+        name: f.name || undefined,
+        qty: parseReq(f.qty),
+
+        carbs: parseOpt(f.carbs),
+        sugars: parseOpt(f.sugars),
+        fiber: parseOpt(f.fiber),
+        fat: parseOpt(f.fat),
+        protein: parseOpt(f.protein),
+
+        sugarType: f.sugarType || undefined,
+        starchProcessing: f.starchProcessing || undefined,
+        carbsIncludeFiber: !!f.carbsIncludeFiber,
       }));
   }
 
   function onSubmit() {
     const foods = createFoodsFromForms();
-    const ig = computeMealIG(foods);
-    console.log(ig);
+    const ig = computeMealIG(foods as any); // compatible structurellement
 
     if (editingMealId) {
       setMeals((prev) =>
@@ -109,14 +121,22 @@ export default function Home() {
     const nextForms: FoodForm[] = meal.foods.map((f, i) => ({
       id: crypto.randomUUID(),
       titre: `Food ${i + 1}`,
-      name: f.name,
-      qty: String(f.qty),
-      carbs: String(f.carbs),
-      fat: String(f.fat),
-      fiber: String(f.fiber),
-      protein: String(f.protein),
-      cookTime: String(f.cookTime),
-      restTime: String(f.restTime),
+      name: f.name ?? "",
+      qty: s(f.qty),
+
+      carbs: s(f.carbs),
+      sugars: s(f.sugars),
+      fiber: s(f.fiber),
+      fat: s(f.fat),
+      protein: s(f.protein),
+
+      cookTime: s(f.cookTime),
+      restTime: s(f.restTime),
+
+      sugarType: (f.sugarType ?? "") as FoodForm["sugarType"],
+      starchProcessing: (f.starchProcessing ??
+        "") as FoodForm["starchProcessing"],
+      carbsIncludeFiber: !!f.carbsIncludeFiber,
     }));
 
     setEditingMealId(meal.id);
@@ -133,7 +153,7 @@ export default function Home() {
       <h1 className="text-5xl font-bold my-10 text-center">IG-Calculator</h1>
 
       {!open && (
-        <div className="flex items-center justify-center w-full m-5">
+        <div className="flex items-center justify-center w-full mb-5">
           <Button className="text-lg px-6 py-3" onClick={openMeal}>
             New meal
           </Button>

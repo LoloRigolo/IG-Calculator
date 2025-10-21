@@ -3,6 +3,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { Meal } from "@/types/meal";
+import { computeFoodIG } from "@/lib/ig";
 
 interface MealCardProps {
   meal: Meal;
@@ -26,9 +27,10 @@ export default function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
         <ul className="text-sm space-y-2 list-disc pl-6">
           {meal.foods.map((f) => (
             <li key={f.id}>
-              <span className="font-bold">{f.name}</span> — {f.qty} g • Carbs{" "}
-              {f.carbs} g • Fat {f.fat}% • Fiber {f.fiber}% • Protein{" "}
-              {f.protein}%
+              <span className="font-medium">{f.title}</span> — {f.name} •{" "}
+              {f.qty} g • Carbs {f.carbs} g • Fat {f.fat}% • Fiber {f.fiber}% •
+              Protein {f.protein}% • {f.sugarType} • IG{" "}
+              {Math.round(computeFoodIG(f)) - 10}
             </li>
           ))}
         </ul>
